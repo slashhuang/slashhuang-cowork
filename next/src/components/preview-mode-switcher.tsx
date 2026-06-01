@@ -1,7 +1,5 @@
 "use client";
 
-import { useStore } from "@/lib/store";
-
 export type PreviewMode = "article" | "xhs" | "wechat-cover";
 
 const MODES: { id: PreviewMode; label: string; emoji: string }[] = [
@@ -17,8 +15,6 @@ interface PreviewModeSwitcherProps {
 }
 
 export function PreviewModeSwitcher({ mode, onModeChange, onOpenThemePicker }: PreviewModeSwitcherProps) {
-  const locale = useStore((s) => s.locale);
-
   return (
     <div
       className="flex items-center justify-between gap-2 px-4 py-2"

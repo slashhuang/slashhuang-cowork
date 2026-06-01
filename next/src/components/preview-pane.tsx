@@ -92,7 +92,7 @@ export function PreviewPane({
   const refresh = useCallback(() => setRefreshKey((n) => n + 1), []);
   const t = useT();
   const [previewMode, setPreviewMode] = useState<PreviewMode>("article");
-  const [themePickerOpen, setThemePickerOpen] = useState(false);
+  // themePickerOpen + theme picker modal will be wired in a follow-up task
 
   // Browser-level fullscreen for the whole preview pane. The Deck tab has its
   // own fullscreen wired in DeckViewer; we only handle Preview / Source / Log.
@@ -209,7 +209,7 @@ export function PreviewPane({
       className="flex h-full flex-col"
       style={{ background: isFullscreen ? "#0a0a0a" : "var(--paper)" }}
     >
-      {!isFullscreen && <PreviewModeSwitcher mode={previewMode} onModeChange={setPreviewMode} onOpenThemePicker={() => setThemePickerOpen(true)} />}
+      {!isFullscreen && <PreviewModeSwitcher mode={previewMode} onModeChange={setPreviewMode} onOpenThemePicker={() => {}} />}
       {!isFullscreen && (
         <div
           className="flex items-center justify-between gap-2 px-4 py-2.5 text-sm"
