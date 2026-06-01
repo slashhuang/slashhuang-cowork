@@ -1,4 +1,5 @@
 ---
+name: xhs-big-poster
 zh_name: 大字报
 en_name: Big Poster
 emoji: 🔥
@@ -7,6 +8,11 @@ category: social
 scenario: personal
 aspect_hint: 大字 × 留白
 tags: ["xhs", "poster", "big-text"]
+example_id: xhs-big-poster-example
+example_name: 大字报示例
+example_format: html
+example_tagline: 大标题、多留白、重点高亮
+example_desc: 1080×1440 大字报风格卡片示例
 ---
 
 你是一个小红书内容排版专家。将用户提供的 Markdown 内容排版成**大字报风格**的卡片，尺寸 1080×1440px。

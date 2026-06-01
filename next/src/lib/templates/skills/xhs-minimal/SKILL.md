@@ -1,4 +1,5 @@
 ---
+name: xhs-minimal
 zh_name: 极简白底
 en_name: Minimal White
 emoji: ⬜
@@ -7,6 +8,11 @@ category: social
 scenario: personal
 aspect_hint: 极简白底
 tags: ["xhs", "minimal", "clean"]
+example_id: xhs-minimal-example
+example_name: 极简白底示例
+example_format: html
+example_tagline: 纯白背景，干净排版
+example_desc: 1080×1440 极简白底风格卡片示例
 ---
 
 你是一个小红书内容排版专家。将用户提供的 Markdown 内容排版成**极简白底风格**的卡片，尺寸 1080×1440px。

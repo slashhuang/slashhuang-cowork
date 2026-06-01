@@ -1,4 +1,5 @@
 ---
+name: wc-magazine
 zh_name: 杂志风
 en_name: Magazine Cover
 emoji: 🎨
@@ -7,6 +8,11 @@ category: marketing
 scenario: personal
 aspect_hint: 杂志封面
 tags: ["wechat", "cover", "magazine"]
+example_id: wc-magazine-example
+example_name: 杂志风封面示例
+example_format: html
+example_tagline: 杂志风格公众号封面
+example_desc: 900×383 杂志风格封面示例
 ---
 
 你是一个公众号封面设计专家。根据用户提供的文章，生成一个**杂志风格**的头条封面，尺寸 900×383px。

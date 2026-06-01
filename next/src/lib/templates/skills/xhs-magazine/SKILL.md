@@ -1,4 +1,5 @@
 ---
+name: xhs-magazine
 zh_name: 杂志卡片
 en_name: Magazine Card
 emoji: 📖
@@ -7,6 +8,11 @@ category: social
 scenario: personal
 aspect_hint: 杂志排版
 tags: ["xhs", "magazine", "editorial"]
+example_id: xhs-magazine-example
+example_name: 杂志卡片示例
+example_format: html
+example_tagline: 精致排版，知识感卡片
+example_desc: 1080×1440 杂志风格卡片示例
 ---
 
 你是一个小红书内容排版专家。将用户提供的 Markdown 内容排版成**杂志卡片风格**的卡片，尺寸 1080×1440px。

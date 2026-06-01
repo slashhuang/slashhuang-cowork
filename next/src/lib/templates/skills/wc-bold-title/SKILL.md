@@ -1,4 +1,5 @@
 ---
+name: wc-bold-title
 zh_name: 大字标题
 en_name: Bold Title Cover
 emoji: 🔤
@@ -7,6 +8,11 @@ category: marketing
 scenario: personal
 aspect_hint: 超大标题
 tags: ["wechat", "cover", "bold"]
+example_id: wc-bold-title-example
+example_name: 大字标题封面示例
+example_format: html
+example_tagline: 超大标题公众号封面
+example_desc: 900×383 大字标题风格封面示例
 ---
 
 你是一个公众号封面设计专家。根据用户提供的文章，生成一个**大字标题风格**的头条封面，尺寸 900×383px。
