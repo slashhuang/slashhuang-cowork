@@ -92,6 +92,8 @@ export type Task = {
    * which historical version of the HTML each public URL points to.
    */
   deployments?: DeploymentRecord[];
+  /** Workspace category this task belongs to. */
+  category: Category;
   // meta
   createdAt: number;
   updatedAt: number;
@@ -134,6 +136,7 @@ function makeTask(init?: Partial<Task>): Task {
     baseContent: init?.baseContent,
     baseHtml: init?.baseHtml,
     sampleId: init?.sampleId,
+    category: (init?.category ?? 'article') as Category,
     createdAt: init?.createdAt ?? now,
     updatedAt: init?.updatedAt ?? now,
   };
@@ -162,6 +165,21 @@ export type LayoutMode = "split" | "editor" | "preview";
 
 export const LAYOUT_MODES: LayoutMode[] = ["editor", "split", "preview"];
 
+/**
+ * Workspace categories. Each task belongs to one category; the sidebar
+ * filters by the active category so the user sees only relevant tasks.
+ */
+export type Category = 'article' | 'invest' | 'family' | 'consult';
+
+export const CATEGORIES: Category[] = ['article', 'invest', 'family', 'consult'];
+
+export const CATEGORY_LABEL: Record<Category, { emoji: string; zh: string; en: string }> = {
+  article: { emoji: '✏️', zh: '写文章', en: 'Writing' },
+  invest:  { emoji: '📈', zh: '投资',    en: 'Investing' },
+  family:  { emoji: '🏠', zh: '家庭关系', en: 'Family' },
+  consult: { emoji: '💼', zh: '企业咨询', en: 'Consulting' },
+};
+
 type Persisted = {
   tasks: Task[];
   activeTaskId: string;
@@ -180,6 +198,7 @@ type Persisted = {
   historyPaneOpen: boolean;
   locale: Locale;
   layoutMode: LayoutMode;
+  activeCategory: Category;
 };
 
 type State = {
@@ -199,6 +218,8 @@ type State = {
   historyPaneOpen: boolean;
   locale: Locale;
   layoutMode: LayoutMode;
+  activeCategory: Category;
+  setActiveCategory: (c: Category) => void;
 
   // task lifecycle
   newTask: (init?: Partial<Pick<Task, "name" | "content" | "format" | "filename" | "templateId">>) => string;
@@ -293,11 +314,12 @@ export const useStore = create<State>()(
       historyPaneOpen: false,
       locale: "en",
       layoutMode: "split",
+      activeCategory: 'article' as Category,
 
       newTask: (init) => {
         const tasks = get().tasks;
         const n = tasks.length + 1;
-        const t = makeTask({ name: init?.name ?? `任务 ${n}`, ...init });
+        const t = makeTask({ name: init?.name ?? `任务 ${n}`, category: get().activeCategory, ...init });
         set({ tasks: [...tasks, t], activeTaskId: t.id });
         return t.id;
       },
@@ -485,12 +507,13 @@ export const useStore = create<State>()(
       setHistoryPaneOpen: (v) => set({ historyPaneOpen: v }),
       setLocale: (l) => set({ locale: l }),
       setLayoutMode: (m) => set({ layoutMode: m }),
+      setActiveCategory: (c) => set({ activeCategory: c }),
     }),
     {
       // Legacy key from the old "HTML Everything" brand; do NOT rename — every
       // existing user's saved tasks live under this localStorage key.
       name: "html-everything-store",
-      version: 7,
+      version: 8,
       partialize: (s): Persisted => ({
         tasks: s.tasks.map((t) => ({
           ...t,
@@ -506,6 +529,7 @@ export const useStore = create<State>()(
         historyPaneOpen: s.historyPaneOpen,
         locale: s.locale,
         layoutMode: s.layoutMode,
+        activeCategory: s.activeCategory,
       }),
       migrate: (persisted, fromVersion): Persisted => {
         // v1 → v2: wrap top-level content/format/filename/selectedTemplate into a single task.
@@ -568,6 +592,21 @@ export const useStore = create<State>()(
           if (Array.isArray(p.tasks)) {
             for (const t of p.tasks as Array<Record<string, unknown>>) {
               if (!Array.isArray(t.deployments)) t.deployments = [];
+            }
+          }
+        }
+        // v7 → v8: introduce activeCategory (default 'article').
+        if (fromVersion < 8 && persisted && typeof persisted === "object") {
+          const p = persisted as Record<string, unknown>;
+          if (!p.activeCategory || typeof p.activeCategory !== "string" || !CATEGORIES.includes(p.activeCategory as Category)) {
+            p.activeCategory = 'article';
+          }
+          // Also patch existing tasks that lack category field.
+          if (Array.isArray(p.tasks)) {
+            for (const t of p.tasks as Array<Record<string, unknown>>) {
+              if (!t.category || typeof t.category !== "string" || !CATEGORIES.includes(t.category as Category)) {
+                t.category = 'article';
+              }
             }
           }
         }
