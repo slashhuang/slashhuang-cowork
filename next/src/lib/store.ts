@@ -369,6 +369,7 @@ export const useStore = create<State>()(
           content: sample.content,
           format: sample.format,
           templateId: sample.templateId,
+          category: get().activeCategory,
           html: sample.html,
           baseContent: sample.content,
           baseHtml: sample.html,
