@@ -10,6 +10,12 @@ import {
   type TemplateDef,
 } from "@/lib/templates";
 
+const THEME_IDS_BY_MODE: Record<string, string[]> = {
+  article: [],
+  xhs: ["xhs-big-poster", "xhs-magazine", "xhs-minimal"],
+  "wechat-cover": ["wc-magazine", "wc-bold-title", "wc-gradient"],
+};
+
 /**
  * Samples gallery — rendered on the "示例" tab in the editor pane. The list
  * comes from `/api/templates` filtered to skills that ship a pre-rendered
@@ -22,13 +28,19 @@ export function SamplesGallery({ onLoaded }: { onLoaded?: () => void }) {
   const loadSample = useStore((s) => s.loadSample);
   const tasks = useStore((s) => s.tasks);
   const locale = useStore((s) => s.locale);
+  const previewMode = useStore((s) => s.previewMode);
   const t = useT();
   const [filter, setFilter] = useState<string>("all");
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
+  const themeIds = THEME_IDS_BY_MODE[previewMode] ?? [];
   const previewable = useMemo(
-    () => (templates ?? []).filter((tpl) => tpl.example?.hasHtml),
-    [templates],
+    () => (templates ?? []).filter((tpl) => {
+      if (!tpl.example?.hasHtml) return false;
+      if (themeIds.length === 0) return true;
+      return themeIds.includes(tpl.id);
+    }),
+    [templates, themeIds],
   );
 
   // group filter chips by scenario (only show scenarios that have ≥1 previewable template)
