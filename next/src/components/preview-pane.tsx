@@ -6,6 +6,7 @@ import { useT, type DictKey } from "@/lib/i18n";
 import { previewHtml, extractHtml } from "@/lib/extract-html";
 import { isDeck } from "@/lib/deck";
 import { DeckViewer } from "./deck-viewer";
+import { PreviewModeSwitcher, type PreviewMode } from "./preview-mode-switcher";
 
 type PreviewTab = "preview" | "deck" | "code" | "log";
 
@@ -90,6 +91,8 @@ export function PreviewPane({
   const [refreshKey, setRefreshKey] = useState(0);
   const refresh = useCallback(() => setRefreshKey((n) => n + 1), []);
   const t = useT();
+  const [previewMode, setPreviewMode] = useState<PreviewMode>("article");
+  const [themePickerOpen, setThemePickerOpen] = useState(false);
 
   // Browser-level fullscreen for the whole preview pane. The Deck tab has its
   // own fullscreen wired in DeckViewer; we only handle Preview / Source / Log.
@@ -206,6 +209,7 @@ export function PreviewPane({
       className="flex h-full flex-col"
       style={{ background: isFullscreen ? "#0a0a0a" : "var(--paper)" }}
     >
+      {!isFullscreen && <PreviewModeSwitcher mode={previewMode} onModeChange={setPreviewMode} onOpenThemePicker={() => setThemePickerOpen(true)} />}
       {!isFullscreen && (
         <div
           className="flex items-center justify-between gap-2 px-4 py-2.5 text-sm"
