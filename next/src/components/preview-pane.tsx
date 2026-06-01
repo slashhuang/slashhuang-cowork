@@ -2,12 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useStore, selectActiveTask, type LogEntry, type RunStats } from "@/lib/store";
-import { useTemplates } from "@/lib/templates";
 import { useT, type DictKey } from "@/lib/i18n";
 import { previewHtml, extractHtml } from "@/lib/extract-html";
 import { isDeck } from "@/lib/deck";
 import { DeckViewer } from "./deck-viewer";
-import { PreviewModeSwitcher, type PreviewMode } from "./preview-mode-switcher";
 
 type PreviewTab = "preview" | "deck" | "code" | "log";
 
@@ -92,9 +90,6 @@ export function PreviewPane({
   const [refreshKey, setRefreshKey] = useState(0);
   const refresh = useCallback(() => setRefreshKey((n) => n + 1), []);
   const t = useT();
-  const [previewMode, setPreviewMode] = useState<PreviewMode>("article");
-  const [themePickerOpen, setThemePickerOpen] = useState(false);
-  const templates = useTemplates();
 
   // Browser-level fullscreen for the whole preview pane. The Deck tab has its
   // own fullscreen wired in DeckViewer; we only handle Preview / Source / Log.
@@ -211,8 +206,6 @@ export function PreviewPane({
       className="flex h-full flex-col"
       style={{ background: isFullscreen ? "#0a0a0a" : "var(--paper)" }}
     >
-      {!isFullscreen && <PreviewModeSwitcher mode={previewMode} onModeChange={setPreviewMode} onOpenThemePicker={() => setThemePickerOpen((o) => !o)} />}
-      {themePickerOpen && <ThemePickerDropdown mode={previewMode} templates={templates} onClose={() => setThemePickerOpen(false)} />}
       {!isFullscreen && (
         <div
           className="flex items-center justify-between gap-2 px-4 py-2.5 text-sm"
@@ -590,80 +583,6 @@ function PreviewPlaceholder({ status }: { status: string }) {
           ))}
         </div>
       )}
-    </div>
-  );
-}
-
-const THEME_IDS_BY_MODE: Record<PreviewMode, string[]> = {
-  article: [],
-  "xhs": ["xhs-big-poster", "xhs-magazine", "xhs-minimal"],
-  "wechat-cover": ["wc-magazine", "wc-bold-title", "wc-gradient"],
-};
-
-function ThemePickerDropdown({ mode, templates, onClose }: { mode: PreviewMode; templates: ReturnType<typeof useTemplates>; onClose: () => void }) {
-  const selectedId = useStore((s) => selectActiveTask(s)?.templateId);
-  const setSelected = useStore((s) => s.setSelectedTemplate);
-  const locale = useStore((s) => s.locale);
-  const tplRef = useRef<HTMLDivElement>(null);
-  const themeIds = THEME_IDS_BY_MODE[mode];
-  const available = (templates ?? []).filter((t) => themeIds.includes(t.id));
-  const t = useT();
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (tplRef.current && !tplRef.current.contains(e.target as Node)) onClose();
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [onClose]);
-
-  const tplName = (def: { zhName: string; enName: string }) =>
-    locale === "en" ? def.enName : def.zhName;
-
-  return (
-    <div
-      ref={tplRef}
-      className="absolute right-4 z-40 mt-2 w-64 od-fade-in overflow-hidden rounded-2xl"
-      style={{
-        background: "var(--surface)",
-        border: "1px solid var(--line-soft)",
-        boxShadow: "0 30px 60px -20px rgba(21, 20, 15, 0.25)",
-      }}
-    >
-      <div className="px-4 pt-3 pb-2 text-[10px] uppercase tracking-[0.18em] text-[var(--ink-faint)]">
-        选择主题
-      </div>
-      <div className="px-1 pb-2">
-        {available.length === 0 ? (
-          <div className="px-4 py-3 text-[12px] text-[var(--ink-faint)]">
-            {t("template.empty.loading")}
-          </div>
-        ) : (
-          available.map((def) => {
-            const isSelected = selectedId === def.id;
-            return (
-              <button
-                key={def.id}
-                onClick={() => {
-                  setSelected(def.id);
-                  onClose();
-                }}
-                className="flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] hover:bg-[var(--paper)]"
-                style={isSelected ? { background: "var(--coral-soft)" } : undefined}
-              >
-                <span className="text-xl">{def.emoji}</span>
-                <div className="min-w-0 flex-1">
-                  <div className="font-semibold text-[var(--ink)]">{tplName(def)}</div>
-                  <div className="text-[11.5px] text-[var(--ink-mute)] leading-snug">
-                    {def.description}
-                  </div>
-                </div>
-                {isSelected && <span className="text-[var(--coral)]">●</span>}
-              </button>
-            );
-          })
-        )}
-      </div>
     </div>
   );
 }

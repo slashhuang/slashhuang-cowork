@@ -249,7 +249,7 @@ export function TemplatePicker() {
 
       {open && (
         <div
-          className="absolute left-0 z-40 mt-2 w-[560px] od-fade-in rounded-2xl overflow-hidden flex flex-col"
+          className="absolute left-1/2 -translate-x-1/2 z-40 mt-2 w-[560px] od-fade-in rounded-2xl overflow-hidden flex flex-col"
           style={{
             background: "var(--surface)",
             border: "1px solid var(--line-soft)",
