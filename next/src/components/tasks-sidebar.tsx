@@ -28,6 +28,7 @@ const STATUS_DOT: Record<ConvertStatus, { color: string; key: DictKey; live: boo
 
 export function TasksSidebar() {
   const tasks = useStore((s) => s.tasks);
+  const activeCategory = useStore((s) => s.activeCategory);
   const activeTaskId = useStore((s) => s.activeTaskId);
   const collapsed = useStore((s) => s.sidebarCollapsed);
   const setCollapsed = useStore((s) => s.setSidebarCollapsed);
@@ -41,8 +42,9 @@ export function TasksSidebar() {
 
   const [query, setQuery] = useState("");
   const trimmed = query.trim().toLowerCase();
+  const categoryTasks = tasks.filter((t) => t.category === activeCategory);
   const filtered = trimmed
-    ? tasks.filter((task) => {
+    ? categoryTasks.filter((task) => {
         if (task.name.toLowerCase().includes(trimmed)) return true;
         if (task.content.toLowerCase().includes(trimmed)) return true;
         const tpl = templates?.find((x) => x.id === task.templateId);
@@ -52,7 +54,7 @@ export function TasksSidebar() {
         }
         return false;
       })
-    : tasks;
+    : categoryTasks;
 
   // tick once per minute so "Xs ago" stays current
   const [, setTick] = useState(0);
@@ -89,7 +91,7 @@ export function TasksSidebar() {
         </button>
         <div className="my-1 h-px w-6" style={{ background: "var(--line-faint)" }} />
         <div className="flex flex-1 flex-col items-center gap-1.5 overflow-y-auto px-1">
-          {tasks.map((task, i) => (
+          {categoryTasks.map((task, i) => (
             <button
               key={task.id}
               onClick={() => setActive(task.id)}
@@ -137,9 +139,9 @@ export function TasksSidebar() {
           <span
             className="rounded-full px-1.5 text-[10px] font-mono tabular-nums"
             style={{ background: "var(--surface)", color: "var(--ink-mute)", border: "1px solid var(--line-faint)" }}
-            title={trimmed ? t("tasks.matchTooltip", { a: filtered.length, b: tasks.length }) : undefined}
+            title={trimmed ? t("tasks.matchTooltip", { a: filtered.length, b: categoryTasks.length }) : undefined}
           >
-            {trimmed ? `${filtered.length}/${tasks.length}` : tasks.length}
+            {trimmed ? `${filtered.length}/${categoryTasks.length}` : categoryTasks.length}
           </span>
         </div>
         <button
@@ -218,7 +220,7 @@ export function TasksSidebar() {
               key={task.id}
               task={task}
               active={task.id === activeTaskId}
-              canDelete={tasks.length > 1}
+              canDelete={categoryTasks.length > 1}
               onActivate={() => setActive(task.id)}
               onRename={(name) => renameTask(task.id, name)}
               onDuplicate={() => duplicateTask(task.id)}
