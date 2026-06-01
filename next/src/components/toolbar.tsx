@@ -1,6 +1,6 @@
 "use client";
 
-import { useStore } from "@/lib/store";
+import { useStore, CATEGORIES, CATEGORY_LABEL, type Category } from "@/lib/store";
 import { useT } from "@/lib/i18n";
 import { TemplatePicker } from "./template-picker";
 import { ExportMenu } from "./export-menu";
@@ -39,6 +39,7 @@ export function Toolbar({
     >
       <div className="flex items-center gap-4">
         <Brand />
+        <CategoryPill />
         <CommunityLinks />
         <div className="hidden h-6 w-px sm:block" style={{ background: "var(--line)" }} />
         <button
@@ -182,5 +183,39 @@ function Brand() {
         </div>
       </div>
     </a>
+  );
+}
+
+function CategoryPill() {
+  const active = useStore((s) => s.activeCategory);
+  const setActive = useStore((s) => s.setActiveCategory);
+
+  return (
+    <div className="flex items-center gap-1">
+      <div className="h-6 w-px" style={{ background: "var(--line)" }} />
+      {CATEGORIES.map((c) => {
+        const label = CATEGORY_LABEL[c];
+        const isActive = active === c;
+        return (
+          <button
+            key={c}
+            onClick={() => setActive(c)}
+            className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] transition-all"
+            style={
+              isActive
+                ? { background: "var(--ink)", color: "var(--paper)" }
+                : {
+                    background: "transparent",
+                    color: "var(--ink-soft)",
+                    border: "1px solid var(--line-faint)",
+                  }
+            }
+          >
+            <span>{label.emoji}</span>
+            <span>{label.zh}</span>
+          </button>
+        );
+      })}
+    </div>
   );
 }
