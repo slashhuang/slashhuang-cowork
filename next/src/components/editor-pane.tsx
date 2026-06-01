@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useStore, selectActiveTask, usePersistHydrated } from "@/lib/store";
+import { useStore, selectActiveTask, usePersistHydrated, type PreviewMode } from "@/lib/store";
 import { detectFormat } from "@/lib/parsers/auto";
 import { useAutosave, relativeTime } from "@/lib/use-autosave";
 import { downloadMarkdown } from "@/lib/export/download";
@@ -27,6 +27,8 @@ export function EditorPane() {
   const format = useStore((s) => selectActiveTask(s)?.format ?? "text");
   const setFormat = useStore((s) => s.setFormat);
   const setFilename = useStore((s) => s.setFilename);
+  const previewMode = useStore((s) => s.previewMode);
+  const setPreviewMode = useStore((s) => s.setPreviewMode);
   const { status: saveStatus, savedAt } = useAutosave();
   const { ingest } = useUploadFile();
   const t = useT();
@@ -55,6 +57,30 @@ export function EditorPane() {
                 {t(TAB_KEY[id])}
               </button>
             ))}
+          </div>
+          <div className="flex shrink-0 items-center gap-1">
+            {([
+              { id: "article" as const, label: "文章", emoji: "📝" },
+              { id: "xhs" as const, label: "小红书", emoji: "📱" },
+              { id: "wechat-cover" as const, label: "公众号封面", emoji: "📰" },
+            ]).map((m) => {
+              const isActive = previewMode === m.id;
+              return (
+                <button
+                  key={m.id}
+                  onClick={() => setPreviewMode(m.id)}
+                  className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[12px] transition-all"
+                  style={
+                    isActive
+                      ? { background: "var(--ink)", color: "var(--paper)" }
+                      : { background: "transparent", color: "var(--ink-soft)", border: "1px solid var(--line-faint)" }
+                  }
+                >
+                  <span>{m.emoji}</span>
+                  <span>{m.label}</span>
+                </button>
+              );
+            })}
           </div>
           {hasContent && (
             <SaveIndicator status={saveStatus} savedAt={savedAt} hasContent={hasContent} />
