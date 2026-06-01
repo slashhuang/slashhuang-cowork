@@ -163,6 +163,8 @@ export const LOCALE_LABEL: Record<Locale, string> = {
  */
 export type LayoutMode = "split" | "editor" | "preview";
 
+export type PreviewMode = "article" | "xhs" | "wechat-cover";
+
 export const LAYOUT_MODES: LayoutMode[] = ["editor", "split", "preview"];
 
 /**
@@ -199,6 +201,7 @@ type Persisted = {
   locale: Locale;
   layoutMode: LayoutMode;
   activeCategory: Category;
+  previewMode: PreviewMode;
 };
 
 type State = {
@@ -219,7 +222,9 @@ type State = {
   locale: Locale;
   layoutMode: LayoutMode;
   activeCategory: Category;
+  previewMode: PreviewMode;
   setActiveCategory: (c: Category) => void;
+  setPreviewMode: (m: PreviewMode) => void;
 
   // task lifecycle
   newTask: (init?: Partial<Pick<Task, "name" | "content" | "format" | "filename" | "templateId">>) => string;
@@ -315,6 +320,7 @@ export const useStore = create<State>()(
       locale: "en",
       layoutMode: "split",
       activeCategory: 'article' as Category,
+      previewMode: "article" as PreviewMode,
 
       newTask: (init) => {
         const tasks = get().tasks;
@@ -510,12 +516,13 @@ export const useStore = create<State>()(
       setLocale: (l) => set({ locale: l }),
       setLayoutMode: (m) => set({ layoutMode: m }),
       setActiveCategory: (c) => set({ activeCategory: c }),
+      setPreviewMode: (m) => set({ previewMode: m }),
     }),
     {
       // Legacy key from the old "HTML Everything" brand; do NOT rename — every
       // existing user's saved tasks live under this localStorage key.
       name: "html-everything-store",
-      version: 8,
+      version: 9,
       partialize: (s): Persisted => ({
         tasks: s.tasks.map((t) => ({
           ...t,
@@ -532,6 +539,7 @@ export const useStore = create<State>()(
         locale: s.locale,
         layoutMode: s.layoutMode,
         activeCategory: s.activeCategory,
+        previewMode: s.previewMode,
       }),
       migrate: (persisted, fromVersion): Persisted => {
         // v1 → v2: wrap top-level content/format/filename/selectedTemplate into a single task.
@@ -610,6 +618,13 @@ export const useStore = create<State>()(
                 t.category = 'article';
               }
             }
+          }
+        }
+        // v8 → v9: introduce previewMode (default 'article').
+        if (fromVersion < 9 && persisted && typeof persisted === "object") {
+          const p = persisted as Record<string, unknown>;
+          if (!p.previewMode || typeof p.previewMode !== "string" || !['article', 'xhs', 'wechat-cover'].includes(p.previewMode as string)) {
+            p.previewMode = 'article';
           }
         }
         return persisted as Persisted;
