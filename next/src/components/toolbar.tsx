@@ -189,13 +189,15 @@ function Brand() {
 function CategoryPill() {
   const active = useStore((s) => s.activeCategory);
   const setActive = useStore((s) => s.setActiveCategory);
+  const locale = useStore((s) => s.locale);
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1" role="group" aria-label="categories">
       <div className="h-6 w-px" style={{ background: "var(--line)" }} />
       {CATEGORIES.map((c) => {
         const label = CATEGORY_LABEL[c];
         const isActive = active === c;
+        const text = locale === "en" ? label.en : label.zh;
         return (
           <button
             key={c}
@@ -210,9 +212,10 @@ function CategoryPill() {
                     border: "1px solid var(--line-faint)",
                   }
             }
+            aria-current={isActive ? "true" : undefined}
           >
             <span>{label.emoji}</span>
-            <span>{label.zh}</span>
+            <span>{text}</span>
           </button>
         );
       })}
