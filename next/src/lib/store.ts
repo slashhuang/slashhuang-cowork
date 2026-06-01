@@ -136,7 +136,7 @@ function makeTask(init?: Partial<Task>): Task {
     baseContent: init?.baseContent,
     baseHtml: init?.baseHtml,
     sampleId: init?.sampleId,
-    category: (init?.category ?? 'article') as Category,
+    category: init?.category ?? 'article',
     createdAt: init?.createdAt ?? now,
     updatedAt: init?.updatedAt ?? now,
   };
@@ -353,6 +353,7 @@ export const useStore = create<State>()(
           format: src.format,
           filename: src.filename,
           templateId: src.templateId,
+          category: src.category,
         });
         set((s) => ({ tasks: [...s.tasks, copy], activeTaskId: copy.id }));
         return copy.id;
